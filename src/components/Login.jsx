@@ -15,14 +15,20 @@ const Login = () => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Fetch user role
+      // Fetch user role and approval status
       const userDoc = await getDoc(doc(db, "users", user.uid));
       if (userDoc.exists()) {
         const userData = userDoc.data();
+
         if (userData.role === "pathologist") {
-          navigate("/Pathologist-Dashboard");
+          if (userData.approved === true) {
+            navigate("/Pathologist-Dashboard");
+          } else {
+            alert("Login success, but your approval is pending or rejected.");
+            return;
+          }
         } else {
-          navigate("/user-dashboard");
+          navigate("/User-Dashboard");
         }
       }
     } catch (error) {

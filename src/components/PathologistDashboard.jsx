@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { auth, db } from "../firebase";
-import { doc, getDoc, collection, query, where, onSnapshot, Timestamp } from "firebase/firestore";
-import { signOut } from "firebase/auth";
+import { 
+  doc, getDoc, collection, query, where, onSnapshot, Timestamp, getDocs 
+} from "firebase/firestore";
+import { signOut, onAuthStateChanged } from "firebase/auth"; // ✅ Fixed missing import
 import { useNavigate } from "react-router-dom";
 import CreateAvailability from "./CreateAvailability"; // Import the component
 
@@ -9,6 +11,7 @@ const PathologistDashboard = () => {
   const [user, setUser] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
   const [availability, setAvailability] = useState([]);
+  const [requests, setRequests] = useState([]);
   const navigate = useNavigate();
 
   // Force refresh user token
@@ -23,18 +26,21 @@ const PathologistDashboard = () => {
     refreshUserToken();
   }, []);
 
-  // Fetch user data on mount
+  // Handle authentication state changes (separated from availability fetching)
   useEffect(() => {
-    const fetchUserData = async () => {
-      if (auth.currentUser) {
-        const userDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
+    const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
         if (userDoc.exists()) {
           setUser(userDoc.data());
         }
+      } else {
+        navigate("/login"); // Redirect if not logged in
       }
-    };
-    fetchUserData();
-  }, []);
+    });
+
+    return () => unsubscribeAuth(); // Cleanup on unmount
+  }, [navigate]);
 
   // Fetch availability in real-time
   useEffect(() => {
@@ -45,15 +51,28 @@ const PathologistDashboard = () => {
         where("expiresAt", ">", Timestamp.now()) // Fetch only non-expired data
       );
 
-      const unsubscribe = onSnapshot(q, (snapshot) => {
+      const unsubscribeAvailability = onSnapshot(q, (snapshot) => {
         const slots = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         console.log("Updated Availability List: ", slots); // Debugging
         setAvailability(slots);
       });
 
-      return () => unsubscribe();
+      return () => unsubscribeAvailability(); // ✅ Fixed duplicate unsubscribe issue
     }
   }, []);
+
+  // Fetch requests received from users
+  useEffect(() => {
+    if (user) {
+      const fetchRequests = async () => {
+        const requestsQuery = query(collection(db, "requests"), where("pathologistId", "==", auth.currentUser.uid));
+        const requestsSnapshot = await getDocs(requestsQuery);
+        const requestList = requestsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setRequests(requestList);
+      };
+      fetchRequests();
+    }
+  }, [user]);
 
   // Handle Logout
   const handleLogout = async () => {
@@ -91,6 +110,31 @@ const PathologistDashboard = () => {
           <p>No availability set.</p>
         )}
       </div>
+
+      <h3>Requests Received</h3>
+      <table border="1" style={{ margin: "20px auto" }}>
+        <thead>
+          <tr>
+            <th>Sr No</th>
+            <th>Name</th>
+            <th>Location</th>
+            <th>WhatsApp Contact</th>
+            <th>Upload</th>
+          </tr>
+        </thead>
+        <tbody>
+          {requests.map((req, index) => (
+            <tr key={req.id}>
+              <td>{index + 1}</td>
+              <td>{req.userName}</td>
+              <td>{req.location || "N/A"}</td>
+              <td><a href={`https://wa.me/${req.contact}`} target="_blank">Chat</a></td>
+              <td><button>Upload Report</button></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      
       <button onClick={handleLogout}>Logout</button>
     </div>
   );

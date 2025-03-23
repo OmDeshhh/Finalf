@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-route
 import Signup from "./components/SignUp";
 import Login from "./components/Login";
 import PathologistDashboard from "./components/PathologistDashboard"; // ✅ Import Dashboard
+import UserDashboard from "./components/UserDashboard";
 import "./App.css";
 
 const NavigationButtons = () => {
@@ -40,6 +41,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup/:type" element={<Signup />} />
           <Route path="/pathologist-dashboard" element={<PathologistDashboard />} /> {/* ✅ Added Dashboard Route */}
+          <Route path="/user-dashboard" element={<UserDashboard />} /> ✅ Added User Dashboard Route
         </Routes>
       </div>
     </Router>
