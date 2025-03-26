@@ -150,23 +150,35 @@ useEffect(() => {
             alert("You must be logged in to book a test.");
             return;
         }
-
+    
+        const bookingData = {
+            userId: user.uid,
+            pathologist: state?.pathologist?.name || "Unknown",
+            tests: selectedTests.map((id) => tests.find((t) => t.id === id)),
+            members,
+            appointment: { date, time },
+            timestamp: new Date().toISOString(),
+        };
+    
         try {
+            // Store in Firestore
             await addDoc(collection(db, "orders"), {
-                userId: user.uid,
-                pathologist: state?.pathologist?.name || "Unknown",
-                tests: selectedTests.map((id) => tests.find((t) => t.id === id)),
-                members,
-                appointment: { date, time },
-                timestamp: serverTimestamp(),
+                ...bookingData,
+                timestamp: serverTimestamp(), // Firestore timestamp
             });
+    
+            // Store locally in localStorage
+            const existingBookings = JSON.parse(localStorage.getItem("bookings")) || [];
+            localStorage.setItem("bookings", JSON.stringify([...existingBookings, bookingData]));
+    
             alert("Booking Confirmed!");
-            navigate("/dashboard");
+            navigate("/user-dashboard");
         } catch (error) {
             console.error("Error booking test:", error);
             alert("Error booking test. Please try again.");
         }
     };
+    
 
     const getMinDate = () => new Date().toISOString().split("T")[0];
 

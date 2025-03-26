@@ -4,6 +4,7 @@ import Login from "./components/Login";
 import PathologistDashboard from "./components/PathologistDashboard"; // ✅ Import Dashboard
 import UserDashboard from "./components/UserDashboard";
 import Booking from "./components/Booking";
+import Profile from "./components/profile";
 import "./App.css";
 
 const NavigationButtons = () => {
@@ -44,6 +45,7 @@ function App() {
           <Route path="/pathologist-dashboard" element={<PathologistDashboard />} /> {/* ✅ Added Dashboard Route */}
           <Route path="/user-dashboard" element={<UserDashboard />} /> ✅ Added User Dashboard Route
           <Route path="/booking" element={<Booking/>}/>
+          <Route path="/profile" element={<Profile/>}/>
         </Routes>
       </div>
     </Router>

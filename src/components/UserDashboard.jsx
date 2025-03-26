@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { auth, db } from "../firebase";
-import { doc, getDoc, collection, addDoc } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 
@@ -9,6 +9,7 @@ const UserDashboard = () => {
   const [user, setUser] = useState(null);
   const [pathologists, setPathologists] = useState([]);
   const [currentLocation, setCurrentLocation] = useState({ lat: 37.7749, lng: -122.4194 });
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -46,7 +47,7 @@ const UserDashboard = () => {
       radius: 5000,
       keyword: "pathologist",
     };
-  
+
     service.nearbySearch(request, (results, status) => {
       if (status === window.google.maps.places.PlacesServiceStatus.OK) {
         const pathologistDetails = results.map((place) => ({
@@ -56,23 +57,20 @@ const UserDashboard = () => {
           address: place.vicinity,
           rating: place.rating || "N/A",
           reviews: place.user_ratings_total || 0,
-          phoneNumber: "Not Available", // Default value if phone number is not found
+          phoneNumber: "Not Available",
         }));
-  
-        // Now, fetch details for each place to get the phone number
+
         pathologistDetails.forEach((pathologist, index) => {
           const detailsRequest = {
             placeId: pathologist.id,
-            fields: ["formatted_phone_number"], // Fetch only the phone number
+            fields: ["formatted_phone_number"],
           };
-  
+
           service.getDetails(detailsRequest, (details, detailsStatus) => {
             if (detailsStatus === window.google.maps.places.PlacesServiceStatus.OK && details.formatted_phone_number) {
-              // Update phone number if available
               pathologistDetails[index].phoneNumber = details.formatted_phone_number;
             }
-  
-            // After updating all phone numbers, set the state
+
             if (index === pathologistDetails.length - 1) {
               setPathologists(pathologistDetails);
             }
@@ -83,20 +81,60 @@ const UserDashboard = () => {
   };
 
   const handleBookNow = (pathologist) => {
-    // Extract only serializable data
     const pathologistData = {
-        id: pathologist.id, // Ensure this is a valid property
-        name: pathologist.name,
-        phone: pathologist.phone,
-        specialization: pathologist.specialization,
-        address: pathologist.address,
+      id: pathologist.id,
+      name: pathologist.name,
+      phone: pathologist.phoneNumber,
+      specialization: pathologist.specialization || "N/A",
+      address: pathologist.address,
     };
 
     navigate("/booking", { state: { pathologist: pathologistData } });
-};
+  };
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    navigate("/login");
+  };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto bg-gradient-to-b from-blue-50 to-white min-h-screen">
+    <div className="p-8 max-w-4xl mx-auto bg-gradient-to-b from-blue-50 to-white min-h-screen relative">
+      {/* Profile Button */}
+      <div className="absolute top-5 right-5">
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg focus:outline-none relative"
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+        >
+          Profile ⏷
+        </button>
+
+        {/* Dropdown */}
+        {dropdownOpen && (
+          <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg border">
+            <ul className="text-gray-700">
+              <li
+                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                onClick={() => navigate("/orders")}
+              >
+                📦 Orders
+              </li>
+              <li
+                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                onClick={() => navigate("/profile")}
+              >
+                👤 Personal Details
+              </li>
+              <li
+                className="px-4 py-2 hover:bg-red-100 cursor-pointer text-red-600"
+                onClick={handleLogout}
+              >
+                🚪 Logout
+              </li>
+            </ul>
+          </div>
+        )}
+      </div>
+
       <h2 className="text-3xl font-extrabold text-center mb-6 text-blue-700">🩺 Nearby Pathologists</h2>
 
       <LoadScript googleMapsApiKey="AIzaSyBqkdtcT7470H4x0oH-FTBFOcSWQ_5U3A8" libraries={["places"]}>
