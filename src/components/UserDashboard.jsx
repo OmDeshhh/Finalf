@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
 import { auth, db } from "../firebase";
-import { doc, getDoc, collection, getDocs, query, where, addDoc } from "firebase/firestore"; // ✅ Fixed missing import
-import { signOut, onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc, collection, addDoc } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 
 const UserDashboard = () => {
   const [user, setUser] = useState(null);
   const [pathologists, setPathologists] = useState([]);
-  const [selectedPathologist, setSelectedPathologist] = useState(null);
-  const [selectedDate, setSelectedDate] = useState("");
-  const [selectedTime, setSelectedTime] = useState("");
-  const [requests, setRequests] = useState([]); // ✅ Track requests sent by user
+  const [currentLocation, setCurrentLocation] = useState({ lat: 37.7749, lng: -122.4194 });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,131 +22,126 @@ const UserDashboard = () => {
         navigate("/login");
       }
     });
-
     return () => unsubscribe();
   }, [navigate]);
 
   useEffect(() => {
-    const fetchAvailablePathologists = async () => {
-      try {
-        const availabilityQuery = query(collection(db, "availability"));
-        const availabilitySnapshot = await getDocs(availabilityQuery);
-        const availablePathologistIds = availabilitySnapshot.docs.map(doc => doc.data().userId);
-
-        if (availablePathologistIds.length === 0) {
-          setPathologists([]); 
-          return;
-        }
-
-        const pathologistsQuery = query(
-          collection(db, "users"),
-          where("role", "==", "pathologist"),
-          where("approved", "==", true),
-          where("__name__", "in", availablePathologistIds)
-        );
-
-        const pathologistsSnapshot = await getDocs(pathologistsQuery);
-        const pathologistList = pathologistsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setPathologists(pathologistList);
-      } catch (error) {
-        console.error("Error fetching pathologists:", error);
-      }
-    };
-
-    fetchAvailablePathologists();
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setCurrentLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+        fetchNearbyPathologists(position.coords.latitude, position.coords.longitude);
+      },
+      (error) => console.error("Error fetching location:", error),
+      { enableHighAccuracy: true }
+    );
   }, []);
 
-  useEffect(() => {
-    if (user) {
-      const fetchRequests = async () => {
-        const requestsQuery = query(collection(db, "requests"), where("userId", "==", auth.currentUser.uid));
-        const requestsSnapshot = await getDocs(requestsQuery);
-        const requestList = requestsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setRequests(requestList);
-      };
-
-      fetchRequests();
-    }
-  }, [user]);
-
-  const handleRequest = async () => {
-    if (!selectedPathologist || !selectedDate || !selectedTime) {
-      alert("Please select a pathologist, date, and time.");
-      return;
-    }
-
-    try {
-      await addDoc(collection(db, "requests"), {
-        userId: auth.currentUser.uid,
-        userName: user.name,
-        pathologistId: selectedPathologist.id,
-        pathologistName: selectedPathologist.companyName,
-        date: selectedDate,
-        time: selectedTime,
-        status: "pending",
-      });
-      alert("Request sent successfully!");
-    } catch (error) {
-      console.error("Error sending request: ", error);
-    }
+  const fetchNearbyPathologists = (lat, lng) => {
+    const service = new window.google.maps.places.PlacesService(document.createElement("div"));
+    const request = {
+      location: new window.google.maps.LatLng(lat, lng),
+      radius: 5000,
+      keyword: "pathologist",
+    };
+  
+    service.nearbySearch(request, (results, status) => {
+      if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+        const pathologistDetails = results.map((place) => ({
+          id: place.place_id,
+          name: place.name,
+          location: place.geometry.location,
+          address: place.vicinity,
+          rating: place.rating || "N/A",
+          reviews: place.user_ratings_total || 0,
+          phoneNumber: "Not Available", // Default value if phone number is not found
+        }));
+  
+        // Now, fetch details for each place to get the phone number
+        pathologistDetails.forEach((pathologist, index) => {
+          const detailsRequest = {
+            placeId: pathologist.id,
+            fields: ["formatted_phone_number"], // Fetch only the phone number
+          };
+  
+          service.getDetails(detailsRequest, (details, detailsStatus) => {
+            if (detailsStatus === window.google.maps.places.PlacesServiceStatus.OK && details.formatted_phone_number) {
+              // Update phone number if available
+              pathologistDetails[index].phoneNumber = details.formatted_phone_number;
+            }
+  
+            // After updating all phone numbers, set the state
+            if (index === pathologistDetails.length - 1) {
+              setPathologists(pathologistDetails);
+            }
+          });
+        });
+      }
+    });
   };
 
-  const handleLogout = async () => {
-    await signOut(auth);
-    navigate("/login");
-  };
+  const handleBookNow = (pathologist) => {
+    // Extract only serializable data
+    const pathologistData = {
+        id: pathologist.id, // Ensure this is a valid property
+        name: pathologist.name,
+        phone: pathologist.phone,
+        specialization: pathologist.specialization,
+        address: pathologist.address,
+    };
+
+    navigate("/booking", { state: { pathologist: pathologistData } });
+};
 
   return (
-    <div style={{ textAlign: "center", padding: "20px" }}>
-      <h2>User Dashboard</h2>
-      {user ? (
-        <div>
-          <p><strong>Email:</strong> {user.email}</p>
-          <button onClick={handleLogout}>Logout</button>
+    <div className="p-8 max-w-4xl mx-auto bg-gradient-to-b from-blue-50 to-white min-h-screen">
+      <h2 className="text-3xl font-extrabold text-center mb-6 text-blue-700">🩺 Nearby Pathologists</h2>
 
-          <h3>Select Available Pathologist</h3>
-          <select onChange={(e) => setSelectedPathologist(JSON.parse(e.target.value))}>
-            <option value="">-- Select Pathologist --</option>
-            {pathologists.map((pathologist) => (
-              <option key={pathologist.id} value={JSON.stringify(pathologist)}>
-                {pathologist.companyName} - {pathologist.contactNumber}
-              </option>
-            ))}
-          </select>
+      <LoadScript googleMapsApiKey="AIzaSyBqkdtcT7470H4x0oH-FTBFOcSWQ_5U3A8" libraries={["places"]}>
+        <GoogleMap
+          mapContainerStyle={{ height: "300px", width: "100%", borderRadius: "12px" }}
+          center={currentLocation}
+          zoom={12}
+        >
+          <Marker position={currentLocation} icon="http://maps.google.com/mapfiles/ms/icons/blue-dot.png" />
+          {pathologists.map((p) => (
+            <Marker key={p.id} position={{ lat: p.location.lat(), lng: p.location.lng() }} />
+          ))}
+        </GoogleMap>
+      </LoadScript>
 
-          <h3>Select Date & Time</h3>
-          <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} />
-          <input type="time" value={selectedTime} onChange={(e) => setSelectedTime(e.target.value)} />
-
-          <button onClick={handleRequest}>Send Request</button>
-
-          <h3>Requests Sent</h3>
-          <table border="1" style={{ margin: "20px auto" }}>
-            <thead>
-              <tr>
-                <th>Sr No</th>
-                <th>Name</th>
-                <th>Location</th>
-                <th>WhatsApp Contact</th>
-                <th>Upload</th>
-              </tr>
-            </thead>
-            <tbody>
-              {requests.map((req, index) => (
-                <tr key={req.id}>
-                  <td>{index + 1}</td>
-                  <td>{req.pathologistName}</td>
-                  <td>{req.location || "N/A"}</td>
-                  <td><a href={`https://wa.me/${req.contact}`} target="_blank">Chat</a></td>
-                  <td>--</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <p>Loading...</p>
-      )}
+      <div className="grid gap-6 mt-6">
+        {pathologists.map((p) => (
+          <div key={p.id} className="p-5 border-l-8 border-blue-500 shadow-xl bg-white rounded-xl">
+            <h3 className="font-bold text-xl text-blue-600">{p.name}</h3>
+            <p className="text-sm text-gray-500">📍 {p.address}</p>
+            <p className="text-sm text-gray-500">⭐ {p.rating} ({p.reviews} reviews)</p>
+            <p className="text-sm text-gray-500">📞 {p.phoneNumber}</p>
+            <div className="mt-4 flex gap-3">
+              <button
+                className="bg-green-500 hover:bg-green-600 px-4 py-2 text-white rounded-lg"
+                onClick={() => handleBookNow(p)}
+              >
+                ✅ Book Test
+              </button>
+              <button
+                className="bg-gray-500 hover:bg-gray-600 px-4 py-2 text-white rounded-lg"
+                onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${p.location.lat()},${p.location.lng()}`, "_blank")}
+              >
+                📍 Get Directions
+              </button>
+              <button
+                className="bg-blue-500 hover:bg-blue-600 px-4 py-2 text-white rounded-lg"
+                onClick={() => alert(`Calling ${p.phoneNumber}`)}
+              >
+                📞 Call Now
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
