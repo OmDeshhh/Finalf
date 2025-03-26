@@ -3,6 +3,7 @@ import { auth, db } from "../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate, useLocation } from "react-router-dom";
+import './SignUp.css';
 
 const Signup = () => {
   const navigate = useNavigate();

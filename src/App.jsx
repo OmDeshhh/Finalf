@@ -5,6 +5,12 @@ import PathologistDashboard from "./components/PathologistDashboard"; // ✅ Imp
 import UserDashboard from "./components/UserDashboard";
 import Booking from "./components/Booking";
 import Profile from "./components/profile";
+import HomePage from "./components/HomePage";
+import Assessment from "./components/Assessment";
+import Results from "./components/Results";
+import Dashboard from "./components/Dashboard";
+import Chatbot from "./components/ChatBot";
+import Diet from "./components/Diet";
 import "./App.css";
 
 const NavigationButtons = () => {
@@ -37,11 +43,16 @@ function App() {
   return (
     <Router>
       <div style={{ textAlign: "center", padding: "20px" }}>
-        <h1>Pathology Booking System</h1>
+        <h1></h1>
         <Routes>
-          <Route path="/" element={<NavigationButtons />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/assessment" element={<Assessment/>}/>
+          <Route path="/results" element={<Results/>}/>
           <Route path="/login" element={<Login />} />
+          <Route path="/dashboard" element={<Dashboard/>}/>
           <Route path="/signup/:type" element={<Signup />} />
+          <Route path="diet" element={<Diet/>}/>
+          <Route path="ChatBot" element={<Chatbot/>}/>
           <Route path="/pathologist-dashboard" element={<PathologistDashboard />} /> {/* ✅ Added Dashboard Route */}
           <Route path="/user-dashboard" element={<UserDashboard />} /> ✅ Added User Dashboard Route
           <Route path="/booking" element={<Booking/>}/>

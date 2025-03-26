@@ -1,0 +1,117 @@
+/* Signup Form Styling */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 400px;
+  padding: 25px;
+  border-radius: 12px;
+  position: relative;
+  background-color: #1a1a1a;
+  color: #fff;
+  border: 1px solid #333;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  margin: auto;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  text-align: center;
+  color: #00bfff;
+}
+
+.message, 
+.signin {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+}
+
+.signin a {
+  color: #00bfff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.signin a:hover {
+  text-decoration: underline royalblue;
+}
+
+.form label {
+  position: relative;
+}
+
+.form label .input {
+  background-color: #333;
+  color: #fff;
+  width: 100%;
+  padding: 15px 10px 5px 10px;
+  outline: 0;
+  border: 1px solid rgba(105, 105, 105, 0.5);
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.form label .input + span {
+  color: rgba(255, 255, 255, 0.5);
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  font-size: 0.9em;
+  transition: 0.3s ease;
+}
+
+.form label .input:focus + span,
+.form label .input:valid + span {
+  color: #00bfff;
+  top: 5px;
+  font-size: 0.75em;
+  font-weight: 600;
+}
+
+.input {
+  font-size: 1rem;
+}
+
+.submit {
+  border: none;
+  outline: none;
+  padding: 12px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 16px;
+  background-color: #00bfff;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.submit:hover {
+  background-color: #00bfff96;
+}
+
+.location-btn {
+  border: none;
+  padding: 10px;
+  background-color: #444;
+  color: #fff;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.location-btn:hover {
+  background-color: #555;
+}
+
+.services-list label {
+  display: block;
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.services-list input {
+  margin-right: 8px;
+}

@@ -28,7 +28,7 @@ const Login = () => {
             return;
           }
         } else {
-          navigate("/User-Dashboard");
+          navigate("/dashboard");
         }
       }
     } catch (error) {
