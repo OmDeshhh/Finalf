@@ -16,14 +16,19 @@ const questions = [
 ];
 
 const Assessment = () => {
-    const navigate = useNavigate(); // ✅ Define navigate using useNavigate()
+    const navigate = useNavigate();
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [score, setScore] = useState(0);
     const [showResult, setShowResult] = useState(false);
+    const [animate, setAnimate] = useState(true);
 
     const selectAnswer = (index) => {
-        setScore(score + index);
-        nextQuestion();
+        setAnimate(false);
+        setTimeout(() => {
+            setScore(score + index);
+            nextQuestion();
+            setAnimate(true);
+        }, 150);
     };
 
     const nextQuestion = () => {
@@ -41,11 +46,16 @@ const Assessment = () => {
                 <p>Answer 10 questions to calculate your risk.</p>
             </div>
             <div className="progress-container">
-                <div className="progress-bar" style={{ width: `${(currentQuestionIndex / questions.length) * 100}%` }}></div>
+                <div
+                    className="progress-bar"
+                    style={{ width: `${(currentQuestionIndex / questions.length) * 100}%` }}
+                ></div>
             </div>
             {!showResult ? (
                 <div className="question-box">
-                    <h2 className="question">{questions[currentQuestionIndex].question}</h2>
+                    <h2 className={`question ${animate ? "fade-in-up" : ""}`}>
+                        {questions[currentQuestionIndex].question}
+                    </h2>
                     <div className="options">
                         {questions[currentQuestionIndex].answers.map((answer, index) => (
                             <div key={index} className="option" onClick={() => selectAnswer(index)}>
@@ -59,13 +69,15 @@ const Assessment = () => {
                 <div className="result-box">
                     <h2>📊 Assessment Complete!</h2>
                     <p>{score < 5 ? "🚨 High Risk - Pay attention to your habits." : score < 7 ? "⚠️ Moderate Risk - Consider making minor lifestyle changes." : "🎉 Low Risk - Great job!"}</p>
-                    <button className="btn-glow" onClick={() => {
-    const choice = window.confirm("Are you signing up as a Pathologist? Click OK for Pathologist, Cancel for User.");
-    navigate(choice ? "/signup/pathologist" : "/signup/user");
-}}>
-    🚀 Sign Up / Login
-</button>
-
+                    <button
+                        className="btn-glow"
+                        onClick={() => {
+                            const choice = window.confirm("Are you signing up as a Pathologist? Click OK for Pathologist, Cancel for User.");
+                            navigate(choice ? "/signup/pathologist" : "/signup/user");
+                        }}
+                    >
+                        🚀 Sign Up / Login
+                    </button>
                 </div>
             )}
         </div>

@@ -32,7 +32,14 @@ const HomePage = () => {
                 <div>
                     <h1>🩺 Take Control of Your Health</h1>
                     <p>Understand and manage diabetes effectively with AI-powered insights.</p>
-                    <a href="/assessment" className="btn">🚀 Take Assessment</a>
+
+                    {/* Updated Button */}
+                    <a href="/assessment">
+                        <button className="animated-btn">
+                            <span className="text-lg">🚀 Take Assessment</span>
+                            <div className="glow-effect"></div>
+                        </button>
+                    </a>
                 </div>
             </section>
 
@@ -59,9 +66,12 @@ const HomePage = () => {
             </section>
 
             {/* Footer */}
-            <footer>
-                <p>&copy; 2025 Diabetes Health Hub | All Rights Reserved.</p>
-            </footer>
+            <footer className="footer">
+    <div className="footer-content">
+        <p>&copy; {new Date().getFullYear()} Diabetes Health Hub. All rights reserved.</p>
+    </div>
+</footer>
+
         </div>
     );
 }

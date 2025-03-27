@@ -1,0 +1,192 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  background: none !important;
+  overflow: auto;
+}
+
+.auth-wrapper {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 60px 20px;
+  box-sizing: border-box;
+  z-index: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.auth-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-size: cover;
+  background-position: center;
+  filter: blur(8px);
+  z-index: 0;
+}
+
+.auth-background::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 1;
+}
+
+.login-container {
+  position: relative;
+  z-index: 2;
+  background-color: #1a1a1a;
+  border: 50px solid #333;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  border-radius: 24px;
+  padding: 70px 140px;
+  animation: fadeInSlide 0.8s ease;
+  width: 200%;
+  margin: 60px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 35px;
+  overflow: visible;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.heading {
+  font-size: 36px;
+  font-weight: 600;
+  text-align: center;
+  color: #00bfff;
+  margin-bottom: 20px;
+}
+
+.auth-label {
+  position: relative;
+  display: block;
+}
+
+.auth-input {
+  background-color: #333;
+  color: white;
+  width: 100%;
+  padding: 20px 40px 24px;
+  border: 1px solid #444;
+  border-radius: 12px;
+  font-size: 1.5rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.auth-label .auth-input + span {
+  position: absolute;
+  left: 18px;
+  top: 20px;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.6);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.auth-label .auth-input:focus + span,
+.auth-label .auth-input:valid + span {
+  top: 8px;
+  font-size: 0.8em;
+  font-weight: 600;
+  color: #00bfff;
+}
+
+.login-button {
+  border: none;
+  padding: 18px;
+  border-radius: 12px;
+  background: linear-gradient(to right, #00bfff, #00aaff);
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+  margin-top: 10px;
+}
+
+.login-button:hover {
+  background: linear-gradient(to right, #00aaff, #008fcc);
+  transform: scale(1.03);
+}
+
+.redirect-msg {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 16px;
+  color: #ccc;
+}
+
+.redirect-link {
+  background: none;
+  border: none;
+  color: #00bfff;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 4px;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.redirect-link:hover {
+  color: #00aaff;
+}
+
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    padding: 30px 20px;
+    max-width: 95%;
+    border-radius: 18px;
+  }
+
+  .heading {
+    font-size: 28px;
+  }
+
+  .auth-input {
+    font-size: 1rem;
+    padding: 16px 12px 6px;
+  }
+
+  .login-button {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .login-container {
+    max-width: 1100px;
+  }
+}

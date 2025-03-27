@@ -3,6 +3,8 @@ import { auth, db } from "../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import "./LoginStyles.css";
+import backgroundImage from "./background.jpg";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -15,7 +17,6 @@ const Login = () => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Fetch user role and approval status
       const userDoc = await getDoc(doc(db, "users", user.uid));
       if (userDoc.exists()) {
         const userData = userDoc.data();
@@ -24,7 +25,7 @@ const Login = () => {
           if (userData.approved === true) {
             navigate("/Pathologist-Dashboard");
           } else {
-            alert("Login success, but your approval is pending or rejected.");
+            alert("Login successful, but your approval is pending or rejected.");
             return;
           }
         } else {
@@ -37,13 +38,49 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
-        <input type="email" placeholder="Email" onChange={(e) => setEmail(e.target.value)} required />
-        <input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} required />
-        <button type="submit">Login</button>
-      </form>
+    <div className="auth-wrapper">
+      <div
+        className="auth-background"
+        style={{ backgroundImage: `url(${backgroundImage})` }}
+      />
+      <div className="login-container">
+        <h2 className="heading">Login</h2>
+        <form className="login-form" onSubmit={handleLogin}>
+          <label className="auth-label">
+            <input
+              className="auth-input"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <span>Email</span>
+          </label>
+          <label className="auth-label">
+            <input
+              className="auth-input"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <span>Password</span>
+          </label>
+          <button type="submit" className="login-button">
+            Login
+          </button>
+          <div className="redirect-msg">
+            Don’t have an account?
+            <button
+              type="button"
+              className="redirect-link"
+              onClick={() => navigate("/signup")}
+            >
+              Sign up
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

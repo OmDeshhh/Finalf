@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { auth, db } from "../firebase";
-import { doc, getDoc } from "firebase/firestore";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import "./Dashboard.css"; // Import the CSS for Dashboard
+import "./Dashboard.css";
 
 function Dashboard() {
   const navigate = useNavigate();
-  
+
   return (
     <div className="dashboard">
+      {/* Navbar */}
+   
       {/* Welcome Banner */}
       <section className="banner">
         <h1>👋 Welcome back, <span id="username">User</span>!</h1>
@@ -19,32 +17,44 @@ function Dashboard() {
 
       {/* Feature Cards */}
       <section className="features">
-        <div className="feature-card glass" onClick={() => navigate('/Diet')}>
-          <img 
-            src="https://cdn-icons-png.flaticon.com/512/1046/1046797.png" 
-            alt="Diet Plan" 
-            className="feature-img" 
+        <div className="feature-card glass" onClick={() => navigate('/diet')}>
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/1046/1046797.png"
+            alt="Diet Plan"
+            className="feature-img"
           />
           <h3>🍎 Diet Plan</h3>
           <p>Tailored diet recommendations to manage sugar levels.</p>
         </div>
-        <div className="feature-card glass" onClick={() => navigate('/Results')}>
-          <img 
-            src="https://cdn-icons-png.flaticon.com/512/3388/3388601.png" 
-            alt="Tasks" 
-            className="feature-img" 
+
+        <div className="feature-card glass" onClick={() => navigate('/exercise')}>
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/1049/1049254.png"
+            alt="Exercise Tips"
+            className="feature-img"
           />
-          <h3>📋 Daily Tasks</h3>
-          <p>Track and complete daily goals for a healthier you.</p>
+          <h3>🏃 Exercise Tips</h3>
+          <p>Stay active with daily routines for better health.</p>
         </div>
-        <div className="feature-card glass" onClick={() => navigate('/ChatBot')}>
-          <img 
-            src="https://cdn-icons-png.flaticon.com/512/2933/2933245.png" 
-            alt="AI Chat" 
-            className="feature-img" 
+
+        <div className="feature-card glass" onClick={() => navigate('/chatbot')}>
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/2933/2933245.png"
+            alt="AI Chat"
+            className="feature-img"
           />
           <h3>🤖 AI Chat</h3>
           <p>Get instant health insights from AI anytime.</p>
+        </div>
+
+        <div className="feature-card glass" onClick={() => navigate('/meals')}>
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png"
+            alt="Meals"
+            className="feature-img"
+          />
+          <h3>🍽️ Meals</h3>
+          <p>Explore diabetes-friendly meals and recipes.</p>
         </div>
       </section>
 
@@ -69,8 +79,8 @@ function Dashboard() {
 
       {/* Book Test Button */}
       <div className="cta">
-        <button 
-          onClick={() => navigate('/user-dashboard')} 
+        <button
+          onClick={() => navigate('/user-dashboard')}
           className="btn-glow"
         >
           🚀 Book Your Next Test
