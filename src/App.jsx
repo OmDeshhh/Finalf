@@ -1,20 +1,18 @@
 import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import Signup from "./components/SignUp";
 import Login from "./components/Login";
-import PathologistDashboard from "./components/PathologistDashboard";
 import UserDashboard from "./components/UserDashboard";
 import Booking from "./components/Booking";
 import Profile from "./components/profile";
 import HomePage from "./components/HomePage";
 import Assessment from "./components/Assessment";
-import Results from "./components/Results";
 import Dashboard from "./components/Dashboard";
 import Chatbot from "./components/ChatBot";
-import Diet from "./components/Diet";
 import Exercise from "./components/Exercise";
-import Meals from "./components/Meals"; // ✅ Imported Meals
+import Meals from "./components/Meals";
+import Loader from "./components/Loader"; 
+import GlucoseMonitoringPage from "./components/GlucoseMonitoringPage";
 import "./App.css";
-import Navbar from "./components/Navbar";
 
 const NavigationButtons = () => {
   const navigate = useNavigate();
@@ -46,20 +44,18 @@ function App() {
   return (
     <Router>
       <div style={{ textAlign: "center", padding: "20px" }}>
-        <Navbar/>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/assessment" element={<Assessment />} />
-          <Route path="/results" element={<Results />} />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/signup/:type" element={<Signup />} />
-          <Route path="/diet" element={<Meals/>} />
+          <Route path="/glucose" element={<GlucoseMonitoringPage/>}/>
+          <Route path="/load" element={<Loader/>}/>
           <Route path="/exercise" element={<Exercise />} />
           <Route path="/chatbot" element={<Chatbot />} />
           <Route path="/meals" element={<Meals />} /> {/* ✅ Meals route added */}
-          <Route path="/pathologist-dashboard" element={<PathologistDashboard />} />
-          <Route path="/user-dashboard" element={<UserDashboard />} />
+          <Route path="/nearbytest" element={<UserDashboard />} />
           <Route path="/booking" element={<Booking />} />
           <Route path="/profile" element={<Profile />} />
         </Routes>

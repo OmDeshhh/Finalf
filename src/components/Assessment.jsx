@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "./Assessment.css";
+import { Stethoscope } from 'lucide-react'; // Add the icons for the navbar
+import { CheckCircle, Clock } from 'lucide-react'; // Clock and check circle icons
 
 const questions = [
     { question: "🍭 Do you crave sugary foods frequently?", answers: ["Never", "Sometimes", "Often", "Always"] },
@@ -19,64 +20,131 @@ const Assessment = () => {
     const navigate = useNavigate();
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [score, setScore] = useState(0);
+    const [selectedAnswer, setSelectedAnswer] = useState(null); // Track the selected answer
     const [showResult, setShowResult] = useState(false);
+    const [answers, setAnswers] = useState([]); // Store the answers locally
     const [animate, setAnimate] = useState(true);
+    const [progressBarStyle, setProgressBarStyle] = useState("bg-blue-500 opacity-100");
+
+    // Clock related state
+    const [isAssessmentInProgress, setIsAssessmentInProgress] = useState(true);
 
     const selectAnswer = (index) => {
-        setAnimate(false);
-        setTimeout(() => {
-            setScore(score + index);
-            nextQuestion();
-            setAnimate(true);
-        }, 150);
+        setSelectedAnswer(index);
     };
 
     const nextQuestion = () => {
-        if (currentQuestionIndex < questions.length - 1) {
-            setCurrentQuestionIndex(currentQuestionIndex + 1);
+        if (selectedAnswer !== null) {
+            // Save the answer to local storage
+            const newAnswers = [...answers, selectedAnswer];
+            setAnswers(newAnswers);
+            setScore(score + selectedAnswer); // Update score with the selected answer
+            setSelectedAnswer(null); // Reset selected answer for next question
+            if (currentQuestionIndex < questions.length - 1) {
+                setCurrentQuestionIndex(currentQuestionIndex + 1);
+            } else {
+                setShowResult(true);
+                setIsAssessmentInProgress(false); // Set to false when assessment is complete
+            }
         } else {
-            setShowResult(true);
+            alert("Please select an answer to proceed.");
         }
     };
 
+    // Change progress bar color for blinking effect
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setProgressBarStyle(prevStyle =>
+                prevStyle === "bg-blue-500 opacity-100" ? "bg-blue-500 opacity-50" : "bg-blue-500 opacity-100"
+            );
+        }, 500);
+        return () => clearInterval(interval);
+    }, []);
+
+    // Fix progress bar completion on last question
+    const progressWidth = showResult ? 100 : ((currentQuestionIndex + 0) / questions.length) * 100;
+
     return (
-        <div className="container">
-            <div className="header">
-                <h1>🩺 Diabetes Risk Assessment</h1>
-                <p>Answer 10 questions to calculate your risk.</p>
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+            {/* Navigation - Fixed to the top */}
+            <nav className="fixed top-0 left-0 w-full bg-white/95 backdrop-blur-md z-50 py-4 px-6 border-b border-gray-200 shadow-md flex justify-between items-center">
+                <div className="flex items-center space-x-2">
+                    <Stethoscope className="h-6 w-6 text-purple-700" />
+                    <span className="text-xl font-bold text-gray-900">HealthGuard</span>
+                </div>
+                {/* Blinking Assessment in Progress button */}
+                <button
+                    className={`px-6 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg ${isAssessmentInProgress ? 'bg-blue-600 text-white animate-pulse' : 'bg-green-600 text-white'}`}
+                    disabled={isAssessmentInProgress}
+                >
+                    {isAssessmentInProgress ? (
+                        <>
+                        <Clock className="inline ml-2 animate-spin" />    Assessment in Progress 
+                        </>
+                    ) : (
+                        <>
+                        <CheckCircle className="inline ml-2" />    Assessment Completed 
+                        </>
+                    )}
+                </button>
+            </nav>
+
+            {/* Header Section */}
+            <div className="container mx-auto px-3 text-center pt-24">
+                <h1 className="text-5xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+                    🩺 Diabetes Risk Assessment
+                </h1>
+                <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
+                    Answer 10 questions to calculate your risk.
+                </p>
             </div>
-            <div className="progress-container">
+
+            {/* Progress Bar */}
+            <div className="w-full h-1.5 bg-gray-200">
                 <div
-                    className="progress-bar"
-                    style={{ width: `${(currentQuestionIndex / questions.length) * 100}%` }}
+                    className={`h-full ${progressBarStyle} transition-all duration-300 ease-in-out`}
+                    style={{ width: `${progressWidth}%` }}
                 ></div>
             </div>
+
+            {/* Questions Section */}
             {!showResult ? (
-                <div className="question-box">
-                    <h2 className={`question ${animate ? "fade-in-up" : ""}`}>
+                <div className="px-6 py-8">
+                    <h2 className={`text-2xl font-bold mb-4 ${animate ? "animate__animated animate__fadeInUp" : ""}`}>
                         {questions[currentQuestionIndex].question}
                     </h2>
-                    <div className="options">
+                    <div className="space-y-4">
                         {questions[currentQuestionIndex].answers.map((answer, index) => (
-                            <div key={index} className="option" onClick={() => selectAnswer(index)}>
+                            <div
+                                key={index}
+                                className={`p-4 rounded-lg cursor-pointer transition-all duration-300 text-lg
+                                ${selectedAnswer === index ? 'bg-blue-600 text-white !important' : 'bg-gray-200 text-gray-800'}`}
+                                onClick={() => selectAnswer(index)}
+                            >
                                 {answer}
                             </div>
                         ))}
                     </div>
-                    <button className="btn" onClick={nextQuestion}>Next</button>
+                    <button
+                        className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-full text-sm font-medium hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
+                        onClick={nextQuestion}
+                    >
+                        Next
+                    </button>
                 </div>
             ) : (
-                <div className="result-box">
-                    <h2>📊 Assessment Complete!</h2>
-                    <p>{score < 5 ? "🚨 High Risk - Pay attention to your habits." : score < 7 ? "⚠️ Moderate Risk - Consider making minor lifestyle changes." : "🎉 Low Risk - Great job!"}</p>
+                <div className="px-6 py-8">
+                    <h2 className="text-3xl font-bold">📊 Assessment Complete!</h2>
+                    <p className="mt-4 text-xl">
+                        {score < 5 ? "🚨 High Risk - Pay attention to your habits." : score < 7 ? "⚠️ Moderate Risk - Consider making minor lifestyle changes." : "🎉 Low Risk - Great job!"}
+                    </p>
                     <button
-                        className="btn-glow"
+                        className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-full text-sm font-medium hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
                         onClick={() => {
-                            const choice = window.confirm("Are you signing up as a Pathologist? Click OK for Pathologist, Cancel for User.");
-                            navigate(choice ? "/signup/pathologist" : "/signup/user");
+                            navigate("/signup/user");
                         }}
                     >
-                        🚀 Sign Up / Login
+                        🚀 Sign Up
                     </button>
                 </div>
             )}

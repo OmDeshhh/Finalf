@@ -116,22 +116,32 @@ const Booking = () => {
     const [time, setTime] = useState("");
 
     // Listen for authentication state changes
-    // Listen for authentication state changes
-useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-        setUser(currentUser);
-        if (currentUser) {
-            setMembers((prevMembers) => {
-                // Ensure we only add the user if they are not already in the list
-                return prevMembers.includes(currentUser.displayName) ? prevMembers : [currentUser.displayName, ...prevMembers];
-            });
-        }
-    });
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser);
+            if (currentUser) {
+                setMembers((prevMembers) => {
+                    return prevMembers.includes(currentUser.displayName) ? prevMembers : [currentUser.displayName, ...prevMembers];
+                });
+            }
+        });
 
-    return () => unsubscribe(); // Cleanup listener on unmount
-}, []);
+        // Prevent back button navigation
+        const handleBeforeUnload = (e) => {
+            e.preventDefault();
+            e.returnValue = '';
+        };
 
+        // Warn user if they attempt to close or reload the page
+        window.addEventListener('beforeunload', handleBeforeUnload);
 
+        return () => {
+            unsubscribe(); // Cleanup listener on unmount
+            window.removeEventListener('beforeunload', handleBeforeUnload); // Cleanup event listener
+        };
+    }, []);
+
+    // Handle next step progress
     const handleTestSelection = (testId) => {
         setSelectedTests((prev) =>
             prev.includes(testId) ? prev.filter((id) => id !== testId) : [...prev, testId]
@@ -140,7 +150,7 @@ useEffect(() => {
 
     const handleAddMember = () => {
         if (newMember.trim()) {
-            setMembers((prevMembers) => [...prevMembers, newMember.trim()]); // Update state correctly
+            setMembers((prevMembers) => [...prevMembers, newMember.trim()]);
             setNewMember(""); // Reset the input field
         }
     };
@@ -150,7 +160,7 @@ useEffect(() => {
             alert("You must be logged in to book a test.");
             return;
         }
-    
+
         const bookingData = {
             userId: user.uid,
             pathologist: state?.pathologist?.name || "Unknown",
@@ -159,100 +169,124 @@ useEffect(() => {
             appointment: { date, time },
             timestamp: new Date().toISOString(),
         };
-    
+
         try {
             // Store in Firestore
             await addDoc(collection(db, "orders"), {
                 ...bookingData,
-                timestamp: serverTimestamp(), // Firestore timestamp
+                timestamp: serverTimestamp(),
             });
-    
+
             // Store locally in localStorage
             const existingBookings = JSON.parse(localStorage.getItem("bookings")) || [];
             localStorage.setItem("bookings", JSON.stringify([...existingBookings, bookingData]));
-    
+
             alert("Booking Confirmed!");
-            navigate("/user-dashboard");
+            navigate("/profile");
         } catch (error) {
             console.error("Error booking test:", error);
             alert("Error booking test. Please try again.");
         }
     };
-    
 
     const getMinDate = () => new Date().toISOString().split("T")[0];
 
     const isSunday = (selectedDate) => new Date(selectedDate).getDay() === 0;
 
+    const isNextButtonDisabled = () => {
+        if (step === 1 && selectedTests.length === 0) return true;
+        if (step === 2 && newMember.trim() === "") return true;
+        if (step === 3 && (!date || isSunday(date) || !time)) return true;
+        return false;
+    };
+
     return (
         <div className="p-8 max-w-3xl mx-auto">
             <h2 className="text-2xl font-bold mb-4">Step {step} of 4</h2>
 
-            {step === 1 && (
-                <div>
-                    <h3 className="text-xl font-bold mb-2">Select Tests</h3>
-                    <table className="w-full border">
-                        <thead>
-                            <tr className="border-b">
-                                <th>Select</th>
-                                <th>Name</th>
-                                <th>Price</th>
-                                <th>Description</th>
-                                <th>Reports In</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {tests.map((test) => (
-                                <tr key={test.id} className="border-b">
-                                    <td>
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedTests.includes(test.id)}
-                                            onChange={() => handleTestSelection(test.id)}
-                                        />
-                                    </td>
-                                    <td>{test.name}</td>
-                                    <td>₹{test.price} (₹{test.originalPrice})</td>
-                                    <td>{test.description}</td>
-                                    <td>{test.reportsIn}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    <button className="bg-blue-500 text-white px-4 py-2 rounded mt-4" onClick={() => setStep(2)}>
-                        Next
-                    </button>
-                </div>
-            )}
+            {/* Progress Bar */}
+            <div className="w-full bg-gray-200 rounded-full mt-6">
+                <div
+                    className={`h-2 rounded-full ${step === 1 ? 'bg-blue-500' : step === 2 ? 'bg-yellow-500' : step === 3 ? 'bg-green-500' : 'bg-red-500'} transition-all duration-500`}
+                    style={{ width: `${(step / 4) * 100}%` }}
+                ></div>
+            </div>
 
-            {step === 2 && (
-                <div>
-                    <h3 className="text-xl font-bold mb-2">Add Members</h3>
-                    {members.map((member, index) => (
-                        <p key={index} className="border p-2 rounded">{member}</p>
-                    ))}
-                    <input
-                        type="text"
-                        className="border p-2 rounded mt-2"
-                        value={newMember}
-                        onChange={(e) => setNewMember(e.target.value)}
-                        placeholder="Enter member name"
-                    />
-                    <button className="bg-gray-500 text-white px-4 py-2 rounded mt-2" onClick={handleAddMember}>
-                        + Add Member
-                    </button>
-                    <button className="bg-blue-500 text-white px-4 py-2 rounded mt-4" onClick={() => setStep(3)}>
-                        Next
-                    </button>
+            {step === 1 && (
+    <div>
+        <h3 className="text-xl font-bold mb-4">Select Tests</h3>
+        <div className="space-y-4">
+            {tests.map((test) => (
+                <div
+                    key={test.id}
+                    onClick={() => handleTestSelection(test.id)} // Toggle selection on click
+                    className={`border p-4 rounded-lg shadow-md flex items-center justify-between cursor-pointer transition-all 
+                        ${selectedTests.includes(test.id) ? 'bg-blue-100 border-blue-500' : 'hover:bg-gray-100'}`} // Change color when selected
+                >
+                    <div className="flex items-center">
+                        <div>
+                            <div className="font-semibold text-lg">{test.name}</div>
+                            <div className="text-gray-600 text-sm">{test.description}</div>
+                        </div>
+                    </div>
+                    <div className="text-xl font-bold text-blue-600">₹{test.price}</div>
                 </div>
-            )}
+            ))}
+        </div>
+        <button
+            className="bg-blue-500 text-white px-6 py-3 rounded-lg mt-6 w-full hover:bg-blue-600 transition-all"
+            onClick={() => setStep(2)}
+            disabled={isNextButtonDisabled()}
+        >
+            Next
+        </button>
+    </div>
+)}
+{step === 2 && (
+    <div>
+        <h3 className="text-xl font-bold mb-2">Add Members</h3>
+        
+        {/* Display the added members */}
+        {members.map((member, index) => (
+            <p key={index} className="border p-2 rounded mb-2">{member}</p>
+        ))}
+
+        <div className="flex items-center gap-2 mt-2">
+            <input
+                type="text"
+                className="border p-2 rounded flex-1"
+                value={newMember}
+                onChange={(e) => setNewMember(e.target.value)}  // Update the new member's name
+                placeholder="Enter member name"
+            />
+            <button
+                className="bg-gray-500 text-white px-4 py-2 rounded"
+                onClick={handleAddMember}  // Handle adding member to the list
+                disabled={newMember.trim() === ""}  // Disable if input is empty
+            >
+                + Add Member
+            </button>
+        </div>
+
+        {/* Next button */}
+        <button
+            className="bg-blue-500 text-white px-6 py-3 rounded-lg mt-6 w-full"
+            onClick={() => setStep(3)}
+            disabled={members.length === 1}  // Disable if no members have been added
+        >
+            Next
+        </button>
+    </div>
+)}
+
+
 
             {step === 3 && (
                 <div>
                     <h3 className="text-xl font-bold mb-2">Select Date & Time</h3>
                     <input
                         type="date"
-                        className="border p-2 rounded mb-2"
+                        className="border p-2 rounded mb-2 w-full"
                         min={getMinDate()}
                         value={date}
                         onChange={(e) => !isSunday(e.target.value) && setDate(e.target.value)}
@@ -260,35 +294,42 @@ useEffect(() => {
                     {isSunday(date) && <p className="text-red-500">Sundays are not available.</p>}
                     <input
                         type="time"
-                        className="border p-2 rounded mb-2"
+                        className="border p-2 rounded mb-2 w-full"
                         min="10:00"
                         max="21:00"
                         value={time}
                         onChange={(e) => setTime(e.target.value)}
                     />
-                    <button className="bg-blue-500 text-white px-4 py-2 rounded mt-4" onClick={() => setStep(4)}>
+                    <button
+                        className="bg-blue-500 text-white px-6 py-3 rounded-lg mt-6 w-full"
+                        onClick={() => setStep(4)}
+                        disabled={isNextButtonDisabled()}
+                    >
                         Next
                     </button>
                 </div>
             )}
 
-{step === 4 && (
-    <div>
-        <h3 className="text-xl font-bold mb-2">Final Review</h3>
-        <table className="w-full border">
-            <tbody>
-                <tr><td>Pathologist</td><td>{state?.pathologist?.name || "Unknown"}</td></tr>
-                <tr><td>Tests</td><td>{selectedTests.map(id => tests.find(t => t.id === id)?.name).join(", ")}</td></tr>
-                <tr><td>Members</td><td>{members.length > 0 ? members.join(", ") : "No members added"}</td></tr>
-                <tr><td>Date</td><td>{date}</td></tr>
-                <tr><td>Time</td><td>{time}</td></tr>
-            </tbody>
-        </table>
-        <button className="bg-green-500 text-white px-4 py-2 rounded mt-4" onClick={handleSubmit}>
-            Confirm Booking
-        </button>
-    </div>
-)}
+            {step === 4 && (
+                <div>
+                    <h3 className="text-xl font-bold mb-2">Final Review</h3>
+                    <table className="w-full border">
+                        <tbody>
+                            <tr><td>Pathologist</td><td>{state?.pathologist?.name || "Unknown"}</td></tr>
+                            <tr><td>Tests</td><td>{selectedTests.map(id => tests.find(t => t.id === id)?.name).join(", ")}</td></tr>
+                            <tr><td>Members</td><td>{members.length > 0 ? members.join(", ") : "No members added"}</td></tr>
+                            <tr><td>Date</td><td>{date}</td></tr>
+                            <tr><td>Time</td><td>{time}</td></tr>
+                        </tbody>
+                    </table>
+                    <button
+                        className="bg-green-500 text-white px-6 py-3 rounded-lg mt-6 w-full"
+                        onClick={handleSubmit}
+                    >
+                        Confirm Booking
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

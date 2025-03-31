@@ -4,6 +4,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import { FaStethoscope } from "react-icons/fa"; // Assuming you're using react-icons for the stethoscope icon.
 
 const UserDashboard = () => {
   const [user, setUser] = useState(null);
@@ -11,7 +12,10 @@ const UserDashboard = () => {
   const [currentLocation, setCurrentLocation] = useState({ lat: 37.7749, lng: -122.4194 });
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
 
+
+  // Check authentication and user data
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
@@ -26,6 +30,7 @@ const UserDashboard = () => {
     return () => unsubscribe();
   }, [navigate]);
 
+  // Get user location and fetch pathologists
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -97,43 +102,65 @@ const UserDashboard = () => {
     navigate("/login");
   };
 
-  return (
-    <div className="p-8 max-w-4xl mx-auto bg-gradient-to-b from-blue-50 to-white min-h-screen relative">
-      {/* Profile Button */}
-      <div className="absolute top-5 right-5">
-        <button
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg focus:outline-none relative"
-          onClick={() => setDropdownOpen(!dropdownOpen)}
-        >
-          Profile ⏷
-        </button>
+  // Toggle dropdown menu
+  const toggleDropdown = () => {
+    setDropdownOpen((prevState) => !prevState);
+  };
 
-        {/* Dropdown */}
-        {dropdownOpen && (
-          <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg border">
-            <ul className="text-gray-700">
-              <li
-                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                onClick={() => navigate("/orders")}
-              >
-                📦 Orders
-              </li>
-              <li
-                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                onClick={() => navigate("/profile")}
-              >
-                👤 Personal Details
-              </li>
-              <li
-                className="px-4 py-2 hover:bg-red-100 cursor-pointer text-red-600"
-                onClick={handleLogout}
-              >
-                🚪 Logout
-              </li>
-            </ul>
+  // Handle profile options
+  const handleProfileOption = (option) => {
+    if (option === "Personal Details") {
+      navigate("/profile");
+    } else if (option === "Orders") {
+      navigate("/orders");
+    } else if (option === "Logout") {
+      handleLogout();
+    }
+  };
+
+  return (
+    <div className="p-8 max-w-4xl mx-auto bg-gradient-to-b from-blue-50 to-white min-h-screen relative mt-20">
+      {/* Navbar */}
+      <nav className="fixed top-0 left-0 w-full bg-white/95 backdrop-blur-md z-50 py-4 px-6 border-b border-gray-200 shadow-md flex justify-between items-center">
+        <div className="flex items-center space-x-2">
+          <FaStethoscope className="h-6 w-6 text-purple-700" />
+          <span className="text-xl font-bold text-gray-900">HealthGuard</span>
+        </div>
+        <div className="flex space-x-4">
+          <div className="relative">
+            <button
+              onClick={toggleDropdown}
+              className="px-6 py-2 bg-transparent text-blue-600 border border-blue-600 rounded-full text-sm font-medium"
+            >
+              Profile
+            </button>
+            {dropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                <ul className="space-y-2 p-2">
+                  <li
+                    className="px-4 py-2 cursor-pointer hover:bg-gray-100 rounded"
+                    onClick={() => handleProfileOption("Personal Details")}
+                  >
+                    Personal Details
+                  </li>
+                  <li
+                    className="px-4 py-2 cursor-pointer hover:bg-gray-100 rounded"
+                    onClick={() => handleProfileOption("Orders")}
+                  >
+                    Orders
+                  </li>
+                  <li
+                    className="px-4 py-2 cursor-pointer hover:bg-gray-100 rounded"
+                    onClick={() => handleProfileOption("Logout")}
+                  >
+                    Logout
+                  </li>
+                </ul>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      </nav>
 
       <h2 className="text-3xl font-extrabold text-center mb-6 text-blue-700">🩺 Nearby Pathologists</h2>
 
@@ -157,26 +184,26 @@ const UserDashboard = () => {
             <p className="text-sm text-gray-500">📍 {p.address}</p>
             <p className="text-sm text-gray-500">⭐ {p.rating} ({p.reviews} reviews)</p>
             <p className="text-sm text-gray-500">📞 {p.phoneNumber}</p>
-            <div className="mt-4 flex gap-3">
-              <button
-                className="bg-green-500 hover:bg-green-600 px-4 py-2 text-white rounded-lg"
-                onClick={() => handleBookNow(p)}
-              >
-                ✅ Book Test
-              </button>
-              <button
-                className="bg-gray-500 hover:bg-gray-600 px-4 py-2 text-white rounded-lg"
-                onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${p.location.lat()},${p.location.lng()}`, "_blank")}
-              >
-                📍 Get Directions
-              </button>
-              <button
-                className="bg-blue-500 hover:bg-blue-600 px-4 py-2 text-white rounded-lg"
-                onClick={() => alert(`Calling ${p.phoneNumber}`)}
-              >
-                📞 Call Now
-              </button>
-            </div>
+            <div className="mt-4 flex gap-3 justify-center items-center">
+  <button
+    className="bg-green-500 hover:bg-green-600 px-4 py-2 text-white rounded-lg"
+    onClick={() => handleBookNow(p)}
+  >
+    ✅ Book Test
+  </button>
+  <button
+    className="bg-gray-500 hover:bg-gray-600 px-4 py-2 text-white rounded-lg"
+    onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${p.location.lat()},${p.location.lng()}`, "_blank")}
+  >
+    📍 Get Directions
+  </button>
+  <button
+    className="bg-blue-500 hover:bg-blue-600 px-4 py-2 text-white rounded-lg"
+    onClick={() => alert(`Calling ${p.phoneNumber}`)}
+  >
+    📞 Call Now
+  </button>
+</div>
           </div>
         ))}
       </div>
