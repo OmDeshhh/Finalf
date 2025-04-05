@@ -243,7 +243,7 @@ const nonVegFoodOptions = {
   <nav className="fixed top-0 left-0 w-full bg-white/95 backdrop-blur-md z-50 py-4 px-6 border-b border-gray-200 shadow-md flex justify-between items-center">
     <div className="flex items-center space-x-2">
       <Stethoscope className="h-6 w-6 text-purple-700" />
-      <span className="text-xl font-bold text-gray-900">HealthGuard</span>
+      <span className="text-xl font-bold text-gray-900">Karunya</span>
     </div>
     <div className="flex space-x-4">
       <div className="relative">
