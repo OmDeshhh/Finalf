@@ -1,4 +1,4 @@
-![1721587022809](https://github.com/user-attachments/assets/2b2d80c0-c6d5-4250-abbc-32a5749e61ce)# 🩺 Smart Diabetes & Prediabetes Management Platform
+# 🩺 Smart Diabetes & Prediabetes Management Platform
 
 A React + Firebase-based solution built for the **Google Solution Challenge 2025**, focused on helping users manage and prevent **diabetes and prediabetes** using real-time tracking, AI-powered insights, and accessible healthcare services.
 
