@@ -1,4 +1,4 @@
-# 🩺 Smart Diabetes & Prediabetes Management Platform
+![1721587022809](https://github.com/user-attachments/assets/2b2d80c0-c6d5-4250-abbc-32a5749e61ce)# 🩺 Smart Diabetes & Prediabetes Management Platform
 
 A React + Firebase-based solution built for the **Google Solution Challenge 2025**, focused on helping users manage and prevent **diabetes and prediabetes** using real-time tracking, AI-powered insights, and accessible healthcare services.
 
@@ -60,27 +60,27 @@ Made with ❤️ by a passionate team of **pre-final year engineering students**
 <table>
   <tr>
     <td align="center">
-      <a href="https://www.linkedin.com/in/aman-singh35/" target="_blank">
-        <img src="team/aman.JPG" width="150"/><br/>
-        <b>Aman Singh</b>
+      <a href="https://www.linkedin.com/in/shivam-wadkar-space/" target="_blank">
+        <img src="https://media.licdn.com/dms/image/v2/D5603AQG68GveAIDqgA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1725124842223?e=1749686400&v=beta&t=iX729E8nRR94WY2JamPBvmMLG4ouPuUEJixUjcX4tZ0" width="150"/><br/>
+        <b>Shivam Wadkar</b>
       </a>
     </td>
     <td align="center">
-      <a href="https://www.linkedin.com/in/khushi-shinde-b32287291" target="_blank">
+      <a href="https://www.linkedin.com/in/omdeshhh/" target="_blank">
         <img src="team/khushishinde.jpg" width="150"/><br/>
-        <b>Khushi Shinde</b>
+        <b>Om Deshmukh</b>
       </a>
     </td>
     <td align="center">
-      <a href="https://www.linkedin.com/in/khushi-borde-759258303" target="_blank">
-        <img src="team/khushiborde.jpg" width="150"/><br/>
-        <b>Khushi Borde</b>
+      <a href="https://www.linkedin.com/in/atharva-kulkarni2004/" target="_blank">
+        <img src="https://media.licdn.com/dms/image/v2/D5603AQGrXqGRKv8XxA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1687974212572?e=1749686400&v=beta&t=qClZ658zCiWPMVKExsXac8auJe_7kJrerWwL8NENVjo" width="150"/><br/>
+        <b>Atharva Kulkarni</b>
       </a>
     </td>
     <td align="center">
-      <a href="https://www.linkedin.com/in/omthoratcse/" target="_blank">
-        <img src="team/om.jpeg" width="150"/><br/>
-        <b>Om Thorat</b>
+      <a href="https://www.linkedin.com/in/samarpan-daniel-5728a7244/" target="_blank">
+        <img src="https://media.licdn.com/dms/image/v2/D5603AQGOoQZHBjO4Ow/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1721587022809?e=1749686400&v=beta&t=YyX8XYClUvZupOJr-nHDqty36phbf9QBgE8ILJgu1ZM" width="150"/><br/>
+        <b>Samarpan Daniel</b>
       </a>
     </td>
   </tr>
