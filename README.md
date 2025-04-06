@@ -57,10 +57,34 @@ Diabetes and prediabetes are growing health concerns, especially due to lack of 
 ## 👨‍💻 Team  
 Made with ❤️ by a passionate team of **pre-final year engineering students** for the **Google Solution Challenge 2025**.
 
-- Shivam Wadkar  
-- Om Deshmukh  
-- Atharva Kulkarni
-- Samarpan Daniel
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://www.linkedin.com/in/aman-singh35/" target="_blank">
+        <img src="team/aman.JPG" width="150"/><br/>
+        <b>Aman Singh</b>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://www.linkedin.com/in/khushi-shinde-b32287291" target="_blank">
+        <img src="team/khushishinde.jpg" width="150"/><br/>
+        <b>Khushi Shinde</b>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://www.linkedin.com/in/khushi-borde-759258303" target="_blank">
+        <img src="team/khushiborde.jpg" width="150"/><br/>
+        <b>Khushi Borde</b>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://www.linkedin.com/in/omthoratcse/" target="_blank">
+        <img src="team/om.jpeg" width="150"/><br/>
+        <b>Om Thorat</b>
+      </a>
+    </td>
+  </tr>
+</table>
 
 
 > We believe that small digital steps can make a big difference in someone’s health journey.
