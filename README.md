@@ -5,13 +5,13 @@
 Diabetes and prediabetes are growing health concerns affecting millions globally. Many people struggle due to lack of awareness, irregular tracking, and delayed diagnosis.
 Our solution aims to simplify diabetes management through a smart, AI-powered platform that combines:
 
-  ##  Manual tracking of sugar levels
+  - Manual tracking of sugar levels
 
-  ##  Personalized health recommendations
+  - Personalized health recommendations
 
-  ##  Easy access to diagnostic services, and
+  -  Easy access to diagnostic services, and
 
-  ##  24/7 AI support for guidance and awareness
+  - 24/7 AI support for guidance and awareness
 
 Built with React and Firebase, our app is user-friendly and accessible to people of all ages, helping them take early action and stay on top of their health.
 
