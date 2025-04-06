@@ -80,7 +80,7 @@ Made with ❤️ by a passionate team of **pre-final year engineering students**
     </td>
     <td align="center">
       <a href="https://www.linkedin.com/in/omdeshhh/" target="_blank">
-        <img src="team/khushishinde.jpg" width="150"/><br/>
+        <img src="https://media.licdn.com/dms/image/v2/D4D03AQFL1Qcj1F1Z5w/profile-displayphoto-shrink_800_800/B4DZYMFe8BHAAc-/0/1743959487283?e=1749686400&v=beta&t=FOZYwb9ApMJL2UVm31fvNyXy2Un495TEfuaAYfBj-Y0" width="150"/><br/>
         <b>Om Deshmukh</b>
       </a>
     </td>
