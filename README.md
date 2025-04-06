@@ -55,7 +55,12 @@ Diabetes and prediabetes are growing health concerns, especially due to lack of 
 
 
 ## 👨‍💻 Team  
-Made with ❤️ by a passionate team of final-year engineering students for the Google Solution Challenge 2025.
+Made with ❤️ by a passionate team of **pre-final year engineering students** for the **Google Solution Challenge 2025**.
+
+- Shivam Wadkar  
+- Om Deshmukh  
+- Atharva Kulkarni
+- Samarpan Daniel
 
 
 > We believe that small digital steps can make a big difference in someone’s health journey.
