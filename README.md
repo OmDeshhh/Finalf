@@ -9,7 +9,7 @@ A React + Firebase-based solution built for the **Google Solution Challenge 2025
 ### 1. 📊 Manual Blood Sugar Logging  
 - Users can **log their blood sugar levels daily or weekly**  
 - System generates **automatic alerts** when levels are too high/low  
-- AI offers **customized diet and exercise plans** based on health history  
+- AI offers **Recommendations** based on health history  
 - Weekly progress tracking with **weight updates and chart visualizations**  
 - Reports can be easily **shared with doctors** for better guidance
 
